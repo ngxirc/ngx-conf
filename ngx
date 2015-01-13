@@ -1,0 +1,231 @@
+#!/usr/bin/env python
+
+##
+# copyright (c) 2015 Michael Lustfield <michael@lustfield.net>
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# Except as contained in this notice, the name(s) of the above copyright
+# holders shall not be used in advertising or otherwise to promote the sale,
+# use or other dealings in this Software without prior written authorization.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+# DEALINGS IN THE SOFTWARE.
+##
+
+import argparse
+import ConfigParser
+import os
+
+
+# Read configuration values
+conf = ConfigParser.SafeConfigParser({
+    'base_dir': '/etc/nginx/',
+    'conf_dir': 'conf.d/',
+    'sites_en': 'sites-enabled/',
+    'sites_dis': 'sites-disabled/',
+    'conf_ext': '.conf',
+    'verbose': 'no',
+    'reload': 'no',
+    'force': 'no'})
+conf.read('/etc/nginx/ngx.cfg')
+conf.read('/etc/ngx.cfg')
+conf.read('ngx.cfg')
+
+# Variable that we'll use a lot.
+sites_en = conf.get('DEFAULT', 'base_dir') + conf.get('DEFAULT', 'sites_en')
+sites_dis = conf.get('DEFAULT', 'base_dir') + conf.get('DEFAULT', 'sites_dis')
+conf_dir = conf.get('DEFAULT', 'base_dir') + conf.get('DEFAULT', 'conf_dir')
+conf_ext = conf.get('DEFAULT', 'conf_ext')
+
+
+def parse_arguments():
+    '''Parse arguments supplied by the user.'''
+    parser = argparse.ArgumentParser(description='nginx configuration helper',
+        epilog='Only one in group (enable|disable|remove|list) is allowed, but'
+               ' the selected arguement can be used multiple times.'
+               ' ex: ngx -e foo -e bar -v -e buz')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('-e', '--enable', action='append',
+        help='enable a configuration file')
+    group.add_argument('-d', '--disable', action='append',
+        help='disable a configuration file')
+    group.add_argument('-x', '--remove', action='append',
+        help='remove a configuration file; will prompt without -f')
+    group.add_argument('-l', '--list', action='store_true',
+        help='list configuration files')
+    parser.add_argument('-f', '--force', action='store_true',
+        default=conf.getboolean('DEFAULT', 'force'),
+        help='force change, even if doing so will destroy data')
+    parser.add_argument('-r', '--reload', action='store_true',
+        default=conf.getboolean('DEFAULT', 'reload'),
+        help='reload configuration after change')
+    parser.add_argument('-v', '--verbose', action='store_true',
+        default=conf.getboolean('DEFAULT', 'verbose'),
+        help='show verbose output; default is quite unless errors')
+    return parser.parse_args()
+
+
+def main():
+    '''Main execution; read arguments and act accordingly.'''
+    args = parse_arguments()
+    if args.enable:
+        enable_configs(args.enable, args.verbose, args.force)
+    elif args.disable:
+        disable_configs(args.disable, args.verbose, args.force)
+    elif args.disable:
+        remove_configs(args.disable, args.verbose, args.force)
+    elif args.list:
+        list_configs()
+    if args.reload and not args.list:
+        reload_nginx()
+
+
+def enable_configs(configs, verbose, force):
+    '''Enable configurtion files specified.'''
+    if type(configs) != list:
+        print('Configuration list is in an incorrect format.')
+        return 1
+
+    for conf in configs:
+        if os.path.isfile(conf_dir + conf + conf_ext) or os.path.islink(sites_en + conf) or os.path.isfile(sites_en + conf):
+            if verbose:
+                print('Configuration file "{}" is already enabled.'.format(conf))
+        elif os.path.isfile(conf_dir + conf + conf_ext + '_disabled'):
+            if not force and os.path.isfile(sites_dis + conf):
+                print('Configuration file "{}" has conflicts.'.format(conf))
+            else:
+                try:
+                    os.rename(conf_dir + conf + conf_ext + '_disabled', conf_dir + conf + conf_ext)
+                    if verbose:
+                        print('Configuration file "{}" has been enabled.'.format(conf))
+                except:
+                    print('Error occured when trying to enable "{}". Permissions?'.format(conf))
+        elif os.path.isfile(sites_dis + conf):
+            try:
+                os.symlink(sites_dis + conf, sites_en + conf)
+                if verbose:
+                    print('Configuration file "{}" has been enabled.'.format(conf))
+            except:
+                print('Error occured when trying to enable "{}". Permissions?'.format(conf))
+        else:
+            print('Configuration file for "{}" was not found.'.format(conf))
+
+
+def disable_configs(configs, verbose, force):
+    '''Disable configurtion files specified.'''
+    if type(configs) != list:
+        print('Configuration list is in an incorrect format.')
+        return 1
+
+    for conf in configs:
+        if not force and os.path.isfile(conf_dir + conf + conf_ext) and os.path.islink(sites_en + conf):
+            print('Configuration file "{}" has conflicts.'.format(conf))
+        elif not force and os.path.isfile(conf_dir + conf + conf_ext) and os.path.isfile(sites_en + conf):
+            print('Configuration file "{}" has conflicts.'.format(conf))
+        elif os.path.isfile(conf_dir + conf + conf_ext):
+            if not force and os.path.isfile(conf_dir + conf + conf_ext + '_disabled'):
+                print('Unable to disable "{}". It appears to have a disabled version.'.format(conf))
+                break
+            elif os.path.isfile(conf_dir + conf + conf_ext + '_disabled'):
+                if verbose:
+                    print('Attempting to remove disabled config for {}.'.format(conf))
+                try:
+                    os.remove(conf_dir + conf + conf_ext + '_disabled')
+                except:
+                    print('Error trying to remove configuration for disabled "{}".'.format(conf))
+                    break
+            try:
+                os.rename(conf_dir + conf + conf_ext, conf_dir + conf + conf_ext + '_disabled')
+                if verbose:
+                    print('Configuration file "{}" has been disabled.'.format(conf))
+            except:
+                print('Error occured when trying to disable "{}". Permissions?'.format(conf))
+        elif os.path.islink(sites_en + conf):
+            try:
+                os.remove(sites_en + conf)
+                if verbose:
+                    print('Configuration file "{}" has been disabled.'.format(conf))
+            except:
+                print('Error occured when trying to disable "{}". Permissions?'.format(conf))
+        elif os.path.isfile(sites_en + conf):
+            if not force and os.path.isfile(sites_dis + conf):
+                print('Unable to disable "{}". It appears to have a disabled version.'.format(conf))
+                break
+            elif os.path.isfile(sites_dis + conf):
+                if verbose:
+                    print('Attempting to remove disabled config for {}.'.format(conf))
+                try:
+                    os.remove(sites_dis + conf)
+                except:
+                    print('Error trying to remove configuration for disabled "{}".'.format(conf))
+                    break
+            try:
+                os.rename(sites_en + conf, sites_dis + conf)
+                if verbose:
+                    print('Configuration file "{}" has been disabled.'.format(conf))
+            except:
+                print('Error occured when trying to disable "{}". Permissions?'.format(conf))
+        else:
+            print('Configuration file for "{}" was not found.'.format(conf))
+
+
+def remove_configs(configs, verbose, force):
+    '''Remove configurtion files specified.'''
+    if type(configs) != list:
+        print('Configuration list is in an incorrect format.')
+        return 1
+
+    for conf in configs:
+        if os.path.islink(sites_en + conf):
+            try:
+                os.remove(sites_en + conf)
+                if verbose:
+                    print('Symlink for "{}" removed.'.format(conf))
+            except:
+                print('Error occured when trying to remove symlink for "{}". Permissions?'.format(conf))
+        files = [sites_en + conf, sites_dis + conf, conf_dir + conf + conf_ext,
+                 conf_dir + conf + conf_ext + '_disabled']
+        for f in files:
+            if os.path.isfile(f):
+                if not force:
+                    pass
+                    #TODO: CONFIRMATION
+                try:
+                    os.remove(f)
+                    if verbose:
+                        print('Configuration file for "{}" was removed.'.format(conf))
+                except:
+                    print('Error occured when trying to remove file for "{}". Permissions?'.format(conf))
+
+
+def list_configs():
+    '''List configuration files.'''
+    pass
+
+
+def get_configs():
+    '''Returns a list of configuration files.'''
+    return {}
+
+
+def reload_nginx():
+    '''Reload Nginx after configuration changes.'''
+    pass
+
+
+if __name__ == '__main__':
+    main()
