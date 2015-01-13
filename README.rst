@@ -6,7 +6,7 @@ A tool to help manage nginx confuration files.
 Synopsis
 --------
 
-ngx-conf [-h] (-e ENABLE | -d DISABLE | -x REMOVE | -l) [-f] [-r] [-v]
+ngx-conf [-h] (-e CONFIG | -d CONFIG | -x CONFIG | -l) [-f] [-r] [-v]
 
 Description
 -----------
