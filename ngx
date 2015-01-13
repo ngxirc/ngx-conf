@@ -30,6 +30,7 @@ import argparse
 import ConfigParser
 import glob
 import os
+import subprocess
 
 
 # Read configuration values
@@ -253,7 +254,17 @@ def get_configs():
 
 def reload_nginx():
     '''Reload Nginx after configuration changes.'''
-    pass
+    child = subprocess.Popen(
+        ['service', 'nginx', 'reload'],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE)
+    stdout, stderr = child.communicate()
+    if int(child.returncode) != 0:
+        print('Error reloading nginx configs.')
+        return False
+    elif verbose:
+        print('Nginx config reloaded successfully.')
+    return True
 
 
 if __name__ == '__main__':
