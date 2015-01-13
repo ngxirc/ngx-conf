@@ -66,3 +66,14 @@ A sample configuration file with all options set to default::
 Make sure that base_dir always has a trailing slash.
 
 Any arguments given to the command will override configuration options.
+
+Bugs
+----
+
+If you experience bugs, the best way to report them is to the upstream bug
+tracker. This can be found at https://github.com/MTecknology/ngx_helper.
+
+Authors
+-------
+
+This application and manual page was written by Michael Lustfield <michael@lustfield.net>.
