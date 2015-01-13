@@ -57,11 +57,11 @@ ngx -f -r -x site1 -x site2
 .PP
 Three configuration files, if present, will be read. They will be read in the following order; the next read file will always override the previous.
 .IP
-/etc/nginx/ngx.cfg
+1. /etc/nginx/ngx.cfg
 .br
-/etc/ngx.cfg
+2. /etc/ngx.cfg
 .br
-ngx.cfg
+3. ngx.cfg
 .PP
 A sample configuration file with all options set to default:
 .IP
