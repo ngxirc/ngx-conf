@@ -29,7 +29,7 @@ can be used to enable, disable, remove, and list configuration files.
 **-r, --reload**
   reload configuration after change
 **-v, --verbose**
-  show verbose output; default is quite unless errors
+  show verbose output; default is quiet unless errors
 
 Only one action (enable|disable|edit|remove) can be performed at one time.
 However, any action can be specified multiple times.
