@@ -51,7 +51,7 @@ following order; the next read file will always override the previous.
 #. /etc/ngx.cfg
 #. ngx.cfg
 
-The following configuration options are default::
+A sample configuration file with all options set to default::
 
     [DEFAULT]
     base_dir = /etc/nginx/
