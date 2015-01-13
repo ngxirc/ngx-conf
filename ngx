@@ -207,9 +207,9 @@ def remove_configs(configs, verbose, force):
                 try:
                     os.remove(f)
                     if verbose:
-                        print('Configuration file for "{}" was removed.'.format(conf))
+                        print('Configuration file for "{}" was removed.'.format(f))
                 except:
-                    print('Error occured when trying to remove file for "{}". Permissions?'.format(conf))
+                    print('Error occured when trying to remove file for "{}". Permissions?'.format(f))
 
 
 def list_configs():
