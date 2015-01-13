@@ -28,11 +28,12 @@
 
 import argparse
 import ConfigParser
+import glob
 import os
 
 
 # Read configuration values
-conf = ConfigParser.SafeConfigParser({
+config_opts = ConfigParser.SafeConfigParser({
     'base_dir': '/etc/nginx/',
     'conf_dir': 'conf.d/',
     'sites_en': 'sites-enabled/',
@@ -41,15 +42,15 @@ conf = ConfigParser.SafeConfigParser({
     'verbose': 'no',
     'reload': 'no',
     'force': 'no'})
-conf.read('/etc/nginx/ngx.cfg')
-conf.read('/etc/ngx.cfg')
-conf.read('ngx.cfg')
+config_opts.read('/etc/nginx/ngx.cfg')
+config_opts.read('/etc/ngx.cfg')
+config_opts.read('ngx.cfg')
 
 # Variable that we'll use a lot.
-sites_en = conf.get('DEFAULT', 'base_dir') + conf.get('DEFAULT', 'sites_en')
-sites_dis = conf.get('DEFAULT', 'base_dir') + conf.get('DEFAULT', 'sites_dis')
-conf_dir = conf.get('DEFAULT', 'base_dir') + conf.get('DEFAULT', 'conf_dir')
-conf_ext = conf.get('DEFAULT', 'conf_ext')
+sites_en = config_opts.get('DEFAULT', 'base_dir') + config_opts.get('DEFAULT', 'sites_en')
+sites_dis = config_opts.get('DEFAULT', 'base_dir') + config_opts.get('DEFAULT', 'sites_dis')
+conf_dir = config_opts.get('DEFAULT', 'base_dir') + config_opts.get('DEFAULT', 'conf_dir')
+conf_ext = config_opts.get('DEFAULT', 'conf_ext')
 
 
 def parse_arguments():
@@ -68,13 +69,13 @@ def parse_arguments():
     group.add_argument('-l', '--list', action='store_true',
         help='list configuration files')
     parser.add_argument('-f', '--force', action='store_true',
-        default=conf.getboolean('DEFAULT', 'force'),
+        default=config_opts.getboolean('DEFAULT', 'force'),
         help='force change, even if doing so will destroy data')
     parser.add_argument('-r', '--reload', action='store_true',
-        default=conf.getboolean('DEFAULT', 'reload'),
+        default=config_opts.getboolean('DEFAULT', 'reload'),
         help='reload configuration after change')
     parser.add_argument('-v', '--verbose', action='store_true',
-        default=conf.getboolean('DEFAULT', 'verbose'),
+        default=config_opts.getboolean('DEFAULT', 'verbose'),
         help='show verbose output; default is quite unless errors')
     return parser.parse_args()
 
@@ -214,12 +215,40 @@ def remove_configs(configs, verbose, force):
 
 def list_configs():
     '''List configuration files.'''
-    pass
+    configs = get_configs()
+    for key, verb in [
+        ('conf_en', 'Configs enabled in {}:'.format(config_opts.get('DEFAULT', 'conf_dir'))),
+        ('conf_dis', 'Configs disabled in {}:'.format(config_opts.get('DEFAULT', 'conf_dir'))),
+        ('sites_en', 'Configs enabled in {}:'.format(config_opts.get('DEFAULT', 'sites_en'))),
+        ('sites_dis', 'Configs disabled in {}:'.format(config_opts.get('DEFAULT', 'sites_dis'))),
+        ('sites_avail', 'All confis available in {}:'.format(config_opts.get('DEFAULT', 'sites_dis')))]:
+        if configs[key] == []:
+            print(verb + '\n\t<none>')
+        else:
+            print(verb)
+            for conf in configs[key]:
+                print('\t' + conf)
 
 
 def get_configs():
     '''Returns a list of configuration files.'''
-    return {}
+    cd = [os.path.basename(f).replace(conf_ext + '_disabled', '')
+        for f in glob.glob(conf_dir + '*' + conf_ext + '_disabled')
+        if os.path.isfile(f)]
+    ce = [os.path.basename(f).replace(conf_ext, '')
+        for f in glob.glob(conf_dir + '*' + conf_ext)
+        if os.path.isfile(f)]
+    se = [os.path.basename(f)
+        for f in glob.glob(sites_en + '*')
+        if os.path.isfile(f) or os.path.islink(f)]
+    sd = [os.path.basename(f)
+        for f in glob.glob(sites_dis + '*')
+        if os.path.isfile(f) and os.path.basename(f) not in se]
+    sa = [os.path.basename(f)
+        for f in glob.glob(sites_dis + '*')
+        if os.path.isfile(f)]
+
+    return {'conf_dis': cd, 'conf_en': ce, 'sites_en': se, 'sites_dis': sd, 'sites_avail': sa}
 
 
 def reload_nginx():
