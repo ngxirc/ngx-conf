@@ -1,18 +1,18 @@
-Nginx Helper Script (ngx)
-=========================
+Nginx Configuration Tool (ngx-conf)
+===================================
 
-A helper script to help manage Nginx configuration files.
+A tool to help manage nginx confuration files.
 
 Synopsis
 --------
 
-ngx [-h] (-e ENABLE | -d DISABLE | -x REMOVE | -l) [-f] [-r] [-v]
+ngx-conf [-h] (-e ENABLE | -d DISABLE | -x REMOVE | -l) [-f] [-r] [-v]
 
 Description
 -----------
 
-Ngx is a relatively simple script to help manage Nginx configuration files. It
-can be used to enable, disable, remove, and list configuration files.
+Ngx-conf is a relatively simple tool to help manage Nginx configuration files.
+It can be used to enable, disable, remove, and list configuration files.
 
 **-h, --help**
   show a help message and exit
@@ -71,7 +71,7 @@ Bugs
 ----
 
 If you experience bugs, the best way to report them is to the upstream bug
-tracker. This can be found at https://github.com/MTecknology/ngx_helper.
+tracker. This can be found at https://github.com/ngx/ngx-conf.
 
 Authors
 -------
