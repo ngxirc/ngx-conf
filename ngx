@@ -36,7 +36,7 @@ conf = ConfigParser.SafeConfigParser({
     'base_dir': '/etc/nginx/',
     'conf_dir': 'conf.d/',
     'sites_en': 'sites-enabled/',
-    'sites_dis': 'sites-disabled/',
+    'sites_dis': 'sites-available/',
     'conf_ext': '.conf',
     'verbose': 'no',
     'reload': 'no',

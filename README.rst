@@ -57,10 +57,12 @@ A sample configuration file with all options set to default::
     base_dir = /etc/nginx/
     conf_dir = conf.d/
     sites_en = sites-enabled/
-    sites_dis = sites-disabled/
+    sites_dis = sites-available/
     conf_ext = .conf
     verbose = no
     reload = no
     force = no
+
+Make sure that base_dir always has a trailing slash.
 
 Any arguments given to the command will override configuration options.
