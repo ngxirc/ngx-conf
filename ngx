@@ -87,8 +87,8 @@ def main():
         enable_configs(args.enable, args.verbose, args.force)
     elif args.disable:
         disable_configs(args.disable, args.verbose, args.force)
-    elif args.disable:
-        remove_configs(args.disable, args.verbose, args.force)
+    elif args.remove:
+        remove_configs(args.remove, args.verbose, args.force)
     elif args.list:
         list_configs()
     if args.reload and not args.list:
@@ -203,8 +203,9 @@ def remove_configs(configs, verbose, force):
         for f in files:
             if os.path.isfile(f):
                 if not force:
-                    pass
-                    #TODO: CONFIRMATION
+                    answer = str(raw_input('Are you sure you want to delete {}? (y/N) '.format(f)))
+                    if answer.lower() != 'y' and answer.lower() != 'yes':
+                        break
                 try:
                     os.remove(f)
                     if verbose:
@@ -247,7 +248,6 @@ def get_configs():
     sa = [os.path.basename(f)
         for f in glob.glob(sites_dis + '*')
         if os.path.isfile(f)]
-
     return {'conf_dis': cd, 'conf_en': ce, 'sites_en': se, 'sites_dis': sd, 'sites_avail': sa}
 
 
