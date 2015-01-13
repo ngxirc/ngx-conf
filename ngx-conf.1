@@ -5,15 +5,15 @@
 .\"
 .TH "NGX-CONF" "1" "01/14/2015" "ngx-conf" "User Commands"
 .\" disable hyphenation
-.nh
+.NH
 .\" disable justification (adjust text to left margin only)
-.ad l
+.AD l
 .SH "NAME"
 ngx - a tool to help manage nginx confuration files
 .SH "SYNOPSIS"
 .B ngx-conf
 .RI [-h]\ (-e\ CONFIG\ |\ -d\ CONFIG\ |\ -x\ CONFIG\ |\ -l)\ [-f]\ [-r]\ [-v]
-.br
+.BR
 .SH "DESCRIPTION"
 .PP
 Ngx-conf is a relatively simple tool to help manage Nginx configuration files.
@@ -46,15 +46,15 @@ reload configuration after change
 .TP
 .B \-v, \-\-verbose
 show verbose output; default is quiet unless errors
-.TP
+.PP
 Only one action (enable|disable|edit|remove) can be performed at one time.
 However, any action can be specified multiple times.
 .SH "EXAMPLES"
 .PP
 ngx-config -e site1 -e site2 -v -e site3
-.br
+.BR
 ngx-config -r -d site
-.br
+.BR
 ngx-config -f -r -x site1 -x site2
 .SH "CONFIGURATION FILES"
 .PP
@@ -62,33 +62,33 @@ Three configuration files, if present, will be read. They will be read in the
 following order; the next read file will always override the previous.
 .IP
 1. /etc/nginx/ngx.cfg
-.br
+.BR
 2. /etc/ngx.cfg
-.br
+.BR
 3. ngx.cfg
 .PP
 A sample configuration file with all options set to default:
 .IP
 [DEFAULT]
-.br
+.BR
 base_dir = /etc/nginx/
-.br
+.BR
 conf_dir = conf.d/
-.br
+.BR
 sites_en = sites-enabled/
-.br
+.BR
 sites_dis = sites-available/
-.br
+.BR
 conf_ext = .conf
-.br
+.BR
 verbose = no
-.br
+.BR
 reload = no
-.br
+.BR
 force = no
 .PP
 Make sure that base_dir always has a trailing slash.
-.br
+.BR
 Any arguments given to the command will override configuration options.
 .SH "BUGS"
 .PP
