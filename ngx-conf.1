@@ -51,11 +51,11 @@ Only one action (enable|disable|edit|remove) can be performed at one time.
 However, any action can be specified multiple times.
 .SH "EXAMPLES"
 .PP
-ngx -e site1 -e site2 -v -e site3
+ngx-config -e site1 -e site2 -v -e site3
 .br
-ngx -r -d site
+ngx-config -r -d site
 .br
-ngx -f -r -x site1 -x site2
+ngx-config -f -r -x site1 -x site2
 .SH "CONFIGURATION FILES"
 .PP
 Three configuration files, if present, will be read. They will be read in the

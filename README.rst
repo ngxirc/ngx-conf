@@ -37,9 +37,9 @@ However, any action can be specified multiple times.
 Examples
 --------
 
-* ngx -e site1 -e site2 -v -e site3
-* ngx -r -d site
-* ngx -f -r -x site1 -x site2
+* ngx-conf -e site1 -e site2 -v -e site3
+* ngx-conf -r -d site
+* ngx-conf -f -r -x site1 -x site2
 
 Configuration Files
 -------------------
