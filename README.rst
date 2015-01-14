@@ -48,11 +48,11 @@ Only one action (enable|disable|remove|list) can be performed at one time.
 Examples
 --------
 
-* ngx-conf -e site1 site2 site3
+ngx-conf -e site1 site2 site3
   enable "site{1,2,3}" configurations
-* ngx-conf -r -d site
+ngx-conf -r -d site
   disable "site" configuration and reload nginx
-* ngx-conf -f -r -x site1 site2
+ngx-conf -f -r -x site1 site2
   remove "site{1,2}" configurations without prompting and reload nginx
 
 Configuration Files
