@@ -57,15 +57,14 @@ conf_ext = config_opts.get('DEFAULT', 'conf_ext')
 def parse_arguments():
     '''Parse arguments supplied by the user.'''
     parser = argparse.ArgumentParser(description='nginx configuration helper',
-        epilog='Only one in group (enable|disable|remove|list) is allowed, but'
-               ' the selected arguement can be used multiple times.'
-               ' ex: ngx -e foo -e bar -v -e buz')
+        epilog='Only one in group (enable|disable|remove|list) is allowed.',
+        usage='ngx-conf [-h] (-e | -d | -x | -l) [-f] [-r] [-v] FILES [FILES]')
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-e', '--enable', action='append',
+    group.add_argument('-e', '--enable', action='store_true',
         help='enable a configuration file')
-    group.add_argument('-d', '--disable', action='append',
+    group.add_argument('-d', '--disable', action='store_true',
         help='disable a configuration file')
-    group.add_argument('-x', '--remove', action='append',
+    group.add_argument('-x', '--remove', action='store_true',
         help='remove a configuration file; will prompt without -f')
     group.add_argument('-l', '--list', action='store_true',
         help='list configuration files')
@@ -78,18 +77,23 @@ def parse_arguments():
     parser.add_argument('-v', '--verbose', action='store_true',
         default=config_opts.getboolean('DEFAULT', 'verbose'),
         help='show verbose output; default is quite unless errors')
+    parser.add_argument('FILES', nargs=argparse.REMAINDER,
+        help='list of configuration files to update')
     return parser.parse_args()
 
 
 def main():
     '''Main execution; read arguments and act accordingly.'''
     args = parse_arguments()
+    if args.FILES == [] and not args.list:
+        print('No files specified. These are required.')
+	return False
     if args.enable:
-        enable_configs(args.enable, args.verbose, args.force)
+        enable_configs(args.FILES, args.verbose, args.force)
     elif args.disable:
-        disable_configs(args.disable, args.verbose, args.force)
+        disable_configs(args.FILES, args.verbose, args.force)
     elif args.remove:
-        remove_configs(args.remove, args.verbose, args.force)
+        remove_configs(args.FILES, args.verbose, args.force)
     elif args.list:
         list_configs()
     if args.reload and not args.list:
