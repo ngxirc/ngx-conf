@@ -13,8 +13,8 @@ Description
 
 Ngx-conf is a relatively simple tool to help manage Nginx configuration files.
 It can be used to enable, disable, remove, and list configuration files. In the
-case of configuration files in conf.d/*.conf, it will handle renaming files to
-an enabled/disabled state. In sites-{enabled,available}/*, it will handle the
+case of configuration files in conf.d/\*.conf, it will handle renaming files to
+an enabled/disabled state. In sites-{enabled,available}/\*, it will handle the
 creation and removal of symbolic links.
 
 **-h, --help**
