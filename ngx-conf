@@ -58,14 +58,14 @@ def parse_arguments():
     '''Parse arguments supplied by the user.'''
     parser = argparse.ArgumentParser(description='nginx configuration helper',
         epilog='Only one in group (enable|disable|remove|list) is allowed.',
-        usage='ngx-conf [-h] (-e | -d | -x | -l) [-f] [-r] [-v] FILES [FILES]')
+        usage='ngx-conf [-h] (-e | -d | -x | -l) [-f] [-r] [-v] FILE [FILES]')
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('-e', '--enable', action='store_true',
-        help='enable a configuration file')
+        help='enable a configuration files')
     group.add_argument('-d', '--disable', action='store_true',
-        help='disable a configuration file')
+        help='disable a configuration files')
     group.add_argument('-x', '--remove', action='store_true',
-        help='remove a configuration file; will prompt without -f')
+        help='remove a configuration files; will prompt without -f')
     group.add_argument('-l', '--list', action='store_true',
         help='list configuration files')
     parser.add_argument('-f', '--force', action='store_true',
@@ -78,7 +78,7 @@ def parse_arguments():
         default=config_opts.getboolean('DEFAULT', 'verbose'),
         help='show verbose output; default is quite unless errors')
     parser.add_argument('FILES', nargs=argparse.REMAINDER,
-        help='list of configuration files to update')
+        help='a list of configuration files to update')
     return parser.parse_args()
 
 

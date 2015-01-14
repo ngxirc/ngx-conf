@@ -6,22 +6,25 @@ A tool to help manage nginx confuration files.
 Synopsis
 --------
 
-ngx-conf [-h] (-e CONFIG | -d CONFIG | -x CONFIG | -l) [-f] [-r] [-v]
+ngx-conf [-h] (-e | -d | -x | -l) [-f] [-r] [-v] FILE [FILES]
 
 Description
 -----------
 
 Ngx-conf is a relatively simple tool to help manage Nginx configuration files.
-It can be used to enable, disable, remove, and list configuration files.
+It can be used to enable, disable, remove, and list configuration files. In the
+case of configuration files in conf.d/*.conf, it will handle renaming files to
+an enabled/disabled state. In sites-{enabled,available}/*, it will handle the
+creation and removal of symbolic links.
 
 **-h, --help**
   show a help message and exit
-**-e CONFIG, --enable CONFIG**
-  enable a configuration file
-**-d CONFIG, --disable CONFIG**
-  disable a configuration file
-**-x CONFIG, --remove CONFIG**
-  remove a configuration file; will prompt without -f
+**-e, --enable**
+  enable a configuration files
+**-d, --disable**
+  disable a configuration files
+**-x, --remove**
+  remove a configuration files; will prompt without -f
 **-l, --list**
   list configuration files
 **-f, --force**
@@ -30,16 +33,27 @@ It can be used to enable, disable, remove, and list configuration files.
   reload configuration after change
 **-v, --verbose**
   show verbose output; default is quiet unless errors
+**FILES**
+  a list of configuration files to update
 
-Only one action (enable|disable|edit|remove) can be performed at one time.
-However, any action can be specified multiple times.
+Using --force:
+
+* In --remove will not prompt you to delete the file(s).
+* In --enable will ignore conflicts.
+* In --disable will ignore conflicts.
+* In --disable will also delete files from sites-enabled.
+
+Only one action (enable|disable|remove|list) can be performed at one time.
 
 Examples
 --------
 
-* ngx-conf -e site1 -e site2 -v -e site3
+* ngx-conf -e site1 site2 site3
+  enable "site{1,2,3}" configurations
 * ngx-conf -r -d site
-* ngx-conf -f -r -x site1 -x site2
+  disable "site" configuration and reload nginx
+* ngx-conf -f -r -x site1 site2
+  remove "site{1,2}" configurations without prompting and reload nginx
 
 Configuration Files
 -------------------
@@ -76,4 +90,4 @@ tracker. This can be found at https://github.com/ngx/ngx-conf.
 Authors
 -------
 
-This application and manual page was written by Michael Lustfield <michael@lustfield.net>.
+The ngx-conf tool and manual page were written by Michael Lustfield <michael@lustfield.net>.

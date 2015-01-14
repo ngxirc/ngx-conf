@@ -12,12 +12,15 @@
 ngx - a tool to help manage nginx confuration files
 .SH "SYNOPSIS"
 .B ngx-conf
-.RI [-h]\ (-e\ CONFIG\ |\ -d\ CONFIG\ |\ -x\ CONFIG\ |\ -l)\ [-f]\ [-r]\ [-v]
-.BR
+[-h] (-e | -d | -x | -l) [-f] [-r] [-v] FILE [FILES]
+.br
 .SH "DESCRIPTION"
 .PP
 Ngx-conf is a relatively simple tool to help manage Nginx configuration files.
-It can be used to enable, disable, remove, and list configuration files.
+It can be used to enable, disable, remove, and list configuration files. In the
+case of configuration files in conf.d/*.conf, it will handle renaming files to
+an enabled/disabled state. In sites-{enabled,available}/*, it will handle the
+creation and removal of symbolic links.
 .SH "OPTIONS"
 .PP
 This program follows the usual command line syntax, with long options starting
@@ -26,14 +29,14 @@ with two dashes (`\-'). A summary of options is included below.
 .B \-h, \-\-help
 show a help message and exit
 .TP
-.B \-e CONFIG, \-\-enable CONFIG
-enable a configuration file
+.B \-e, \-\-enable
+enable a configuration files
 .TP
-.B \-d CONFIG, \-\-disable CONFIG
-disable a configuration file
+.B \-d, \-\-disable
+disable a configuration files
 .TP
-.B \-x CONFIG, \-\-remove CONFIG
-remove a configuration file; will prompt without -f
+.B \-x, \-\-remove
+remove a configuration files; will prompt without -f
 .TP
 .B \-l, \-\-list
 list configuration files
@@ -46,49 +49,63 @@ reload configuration after change
 .TP
 .B \-v, \-\-verbose
 show verbose output; default is quiet unless errors
+.B FILES
+a list of configuration files to update
 .PP
-Only one action (enable|disable|edit|remove) can be performed at one time.
-However, any action can be specified multiple times.
+Using --force:
+.IP
+* In --remove will not prompt you to delete the file(s).
+.br
+* In --enable will ignore conflicts.
+.br
+* In --disable will ignore conflicts.
+.br
+* In --disable will also delete files from sites-enabled.
+.PP
+Only one action (enable|disable|remove|list) can be performed at one time.
 .SH "EXAMPLES"
 .PP
-ngx-config -e site1 -e site2 -v -e site3
-.BR
-ngx-config -r -d site
-.BR
-ngx-config -f -r -x site1 -x site2
+ngx-conf -e site1 site2 site3
+    enable "site{1,2,3}" configurations
+.br
+ngx-conf -r -d site
+    disable "site" configuration and reload nginx
+.br
+ngx-conf -f -r -x site1 site2
+    remove "site{1,2}" configurations without prompting and reload nginx
 .SH "CONFIGURATION FILES"
 .PP
 Three configuration files, if present, will be read. They will be read in the
 following order; the next read file will always override the previous.
 .IP
 1. /etc/nginx/ngx.cfg
-.BR
+.br
 2. /etc/ngx.cfg
-.BR
+.br
 3. ngx.cfg
 .PP
 A sample configuration file with all options set to default:
 .IP
 [DEFAULT]
-.BR
+.br
 base_dir = /etc/nginx/
-.BR
+.br
 conf_dir = conf.d/
-.BR
+.br
 sites_en = sites-enabled/
-.BR
+.br
 sites_dis = sites-available/
-.BR
+.br
 conf_ext = .conf
-.BR
+.br
 verbose = no
-.BR
+.br
 reload = no
-.BR
+.br
 force = no
 .PP
 Make sure that base_dir always has a trailing slash.
-.BR
+.br
 Any arguments given to the command will override configuration options.
 .SH "BUGS"
 .PP
@@ -96,4 +113,4 @@ If you experience bugs, the best way to report them is to the upstream bug
 tracker. This can be found at https://github.com/ngx/ngx-conf.
 .SH "AUTHORS"
 .PP
-This application and manual page was written by Michael Lustfield <michael@lustfield.net>.
+The ngx-conf tool and manual page were written by Michael Lustfield <michael@lustfield.net>.
