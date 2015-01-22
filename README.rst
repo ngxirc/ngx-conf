@@ -81,6 +81,17 @@ Make sure that base_dir always has a trailing slash.
 
 Any arguments given to the command will override configuration options.
 
+Aliases
+-------
+
+If you're interested in any sort of a2{dis,en}{conf,mod,site}, you can create
+some nice aliases. Examples:
+
+* a2ensite -- alias ngxensite='ngx-conf -e'
+* a2enconf -- alias ngxenconf='ngx-conf -e'
+* a2dissite -- alias ngxdissite='ngx-conf -d'
+* a2disconf -- alias ngxdisconf='ngx-conf -d'
+
 Bugs
 ----
 

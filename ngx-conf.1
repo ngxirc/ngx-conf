@@ -107,6 +107,25 @@ force = no
 Make sure that base_dir always has a trailing slash.
 .br
 Any arguments given to the command will override configuration options.
+.SH "ALIASES"
+.PP
+If you're interested in any sort of a2{dis,en}{conf,mod,site}, you can create
+some nice aliases. Examples:
+.TP
+.B a2ensite
+alias ngxensite='ngx-conf -e'
+.br
+.TP
+.B a2enconf
+alias ngxenconf='ngx-conf -e'
+.br
+.TP
+.B a2dissite
+alias ngxdissite='ngx-conf -d'
+.br
+.TP
+.B a2disconf
+alias ngxdisconf='ngx-conf -d'
 .SH "BUGS"
 .PP
 If you experience bugs, the best way to report them is to the upstream bug
