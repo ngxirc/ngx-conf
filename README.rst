@@ -1,7 +1,7 @@
 Nginx Configuration Tool (ngx-conf)
 ===================================
 
-A tool to help manage nginx confuration files.
+A tool to help manage nginx configuration files.
 
 Synopsis
 --------
