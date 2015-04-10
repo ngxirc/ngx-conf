@@ -12,7 +12,10 @@
 ngx - a tool to help manage nginx configuration files
 .SH "SYNOPSIS"
 .B ngx-conf
-[-h] (-e | -d | -x | -l) [-f] [-r] [-v] FILE [FILES]
+[-h] [-f] [-r] [-v] {enable | disable | remove} NAME..
+.br
+.B ngx-conf
+[-h] [-f] [-v] list
 .br
 .SH "DESCRIPTION"
 .PP
@@ -29,49 +32,62 @@ with two dashes (`\-'). A summary of options is included below.
 .B \-h, \-\-help
 show a help message and exit
 .TP
-.B \-e, \-\-enable
-enable a configuration files
-.TP
-.B \-d, \-\-disable
-disable a configuration files
-.TP
-.B \-x, \-\-remove
-remove a configuration files; will prompt without -f
-.TP
-.B \-l, \-\-list
-list configuration files
-.TP
 .B \-f, \-\-force
 force change, even if doing so will destroy data
 .TP
 .B \-r, \-\-reload
-reload configuration after change
+reload configuration after change (for \fBenable\fR, \fBdisable\fR and
+\fBremove\fR actions).
 .TP
 .B \-v, \-\-verbose
 show verbose output; default is quiet unless errors
-.B FILES
-a list of configuration files to update
 .PP
-Using --force:
+Using
+.B --force
+has the following effects:
 .IP
-In --remove will not prompt you to delete the file(s).
+For the remove action, it will not prompt you to delete the file(s).
 .br
-In --enable will ignore conflicts.
+For the enable action, it will ignore conflicts (overwrite existing files with a
+symlink).
 .br
-In --disable will ignore conflicts.
+For the disable action, it will ignore conflicts (besides symlinks, remove files
+too).
 .br
-In --disable will also delete files from sites-enabled.
+For the disable action, it will also delete files from sites-enabled.
 .PP
-Only one action (enable|disable|remove|list) can be performed at one time.
+.SH "COMMANDS"
+The following commands are understood:
+.PP
+.B enable NAME..
+.RS
+enable one or more sites by name
+.RE
+.PP
+.B disable NAME..
+.RS
+disable one or more sites by name
+.RE
+.PP
+.B remove NAME..
+.RS
+remove one or more sites by name; will prompt without \fB-f\fR
+.RE
+.PP
+.B list
+.RS
+list all available site configuration files
+.RE
+
 .SH "EXAMPLES"
 .PP
-ngx-conf -e site1 site2 site3
+ngx-conf enable site1 site2 site3
     enable "site{1,2,3}" configurations
 .br
-ngx-conf -r -d site
+ngx-conf disable -r site
     disable "site" configuration and reload nginx
 .br
-ngx-conf -f -r -x site1 site2
+ngx-conf -f remove -r site1 site2
     remove "site{1,2}" configurations without prompting and reload nginx
 .SH "CONFIGURATION FILES"
 .PP

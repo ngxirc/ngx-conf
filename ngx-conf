@@ -59,47 +59,57 @@ conf_ext = config_opts.get('DEFAULT', 'conf_ext')
 
 def parse_arguments():
     '''Parse arguments supplied by the user.'''
-    parser = argparse.ArgumentParser(description='nginx configuration helper',
-        epilog='Only one in group (enable|disable|remove|list) is allowed.',
-        usage='ngx-conf [-h] (-e | -d | -x | -l) [-f] [-r] [-v] FILE [FILES]')
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-e', '--enable', action='store_true',
-        help='enable a configuration files')
-    group.add_argument('-d', '--disable', action='store_true',
-        help='disable a configuration files')
-    group.add_argument('-x', '--remove', action='store_true',
-        help='remove a configuration files; will prompt without -f')
-    group.add_argument('-l', '--list', action='store_true',
-        help='list configuration files')
-    parser.add_argument('-f', '--force', action='store_true',
-        default=config_opts.getboolean('DEFAULT', 'force'),
-        help='force change, even if doing so will destroy data')
-    parser.add_argument('-r', '--reload', action='store_true',
+    # General options which apply to all commands
+    general_parser = argparse.ArgumentParser(add_help=False)
+    general_parser.add_argument('-v', '--verbose', action='store_true',
+        default=config_opts.getboolean('DEFAULT', 'verbose'),
+        help='show verbose output; default is quiet unless errors')
+
+    # Options which apply to some commands related to site conf files
+    conf_action_parser = argparse.ArgumentParser(add_help=False)
+    conf_action_parser.add_argument('-r', '--reload', action='store_true',
         default=config_opts.getboolean('DEFAULT', 'reload'),
         help='reload configuration after change')
-    parser.add_argument('-v', '--verbose', action='store_true',
-        default=config_opts.getboolean('DEFAULT', 'verbose'),
-        help='show verbose output; default is quite unless errors')
-    parser.add_argument('FILES', nargs=argparse.REMAINDER,
-        help='a list of configuration files to update')
+    conf_action_parser.add_argument('NAME', nargs='+',
+        help='one or more configuration (file) names to update')
+    conf_action_parser.add_argument('-f', '--force', action='store_true',
+        default=config_opts.getboolean('DEFAULT', 'force'),
+        help='force change, even if doing so will destroy data')
+
+    parser = argparse.ArgumentParser(description='nginx configuration helper',
+        parents=[general_parser]
+    )
+    subparsers = parser.add_subparsers(dest='action')
+    subparsers.required = True
+    # Add actual commands
+    parser_enable = subparsers.add_parser('enable',
+        parents=[general_parser, conf_action_parser],
+        help='enable specified site configuration files')
+    parser_disable = subparsers.add_parser('disable',
+        parents=[general_parser, conf_action_parser],
+        help='disable specified site configuration files')
+    parser_remove = subparsers.add_parser('remove',
+        parents=[general_parser, conf_action_parser],
+        help='remove specified site configuration files')
+    parser_list = subparsers.add_parser('list',
+        parents=[general_parser],
+        help='list all available site configuration files')
+
     return parser.parse_args()
 
 
 def main():
     '''Main execution; read arguments and act accordingly.'''
     args = parse_arguments()
-    if args.FILES == [] and not args.list:
-        print('No files specified. These are required.')
-        return False
-    if args.enable:
-        enable_configs(args.FILES, args.verbose, args.force)
-    elif args.disable:
-        disable_configs(args.FILES, args.verbose, args.force)
-    elif args.remove:
-        remove_configs(args.FILES, args.verbose, args.force)
-    elif args.list:
+    if args.action == 'enable':
+        enable_configs(args.NAME, args.verbose, args.force)
+    elif args.action == 'disable':
+        disable_configs(args.NAME, args.verbose, args.force)
+    elif args.action == 'remove':
+        remove_configs(args.NAME, args.verbose, args.force)
+    elif args.action == 'list':
         list_configs()
-    if args.reload and not args.list:
+    if hasattr(args, 'reload') and args.reload:
         reload_nginx()
 
 

@@ -6,7 +6,8 @@ A tool to help manage nginx configuration files.
 Synopsis
 --------
 
-ngx-conf [-h] (-e | -d | -x | -l) [-f] [-r] [-v] FILE [FILES]
+ngx-conf [-h] [-f] [-r] [-v] {enable|disable|remove} NAME..
+ngx-conf [-h] [-f] [-v] list
 
 Description
 -----------
@@ -17,42 +18,48 @@ case of configuration files in conf.d/\*.conf, it will handle renaming files to
 an enabled/disabled state. In sites-{enabled,available}/\*, it will handle the
 creation and removal of symbolic links.
 
+Options:
+
 **-h, --help**
   show a help message and exit
-**-e, --enable**
-  enable a configuration files
-**-d, --disable**
-  disable a configuration files
-**-x, --remove**
-  remove a configuration files; will prompt without -f
-**-l, --list**
-  list configuration files
 **-f, --force**
   force change, even if doing so will destroy data
 **-r, --reload**
   reload configuration after change
 **-v, --verbose**
   show verbose output; default is quiet unless errors
-**FILES**
+
+Actions:
+
+**enable**
+  enable one or more sites by name
+**disable**
+  disable one or more sites by name
+**remove**
+  remove one or more sites by name; will prompt without **-f**
+**list**
+  list all available site configuration files
+
+**NAME**
   a list of configuration files to update
 
-Using --force:
+Using --force has the following effects:
 
-* In --remove will not prompt you to delete the file(s).
-* In --enable will ignore conflicts.
-* In --disable will ignore conflicts.
-* In --disable will also delete files from sites-enabled.
-
-Only one action (enable|disable|remove|list) can be performed at one time.
+* For the remove action, it will not prompt you to delete the file(s).
+* For the enable action, it will ignore conflicts (overwrite existing files with
+  a symlink).
+* For the disable action, it will ignore conflicts (besides symlinks, remove
+  files too).
+* For the disable action, it will also delete files from sites-enabled.
 
 Examples
 --------
 
-ngx-conf -e site1 site2 site3
+ngx-conf enable site1 site2 site3
   enable "site{1,2,3}" configurations
-ngx-conf -r -d site
+ngx-conf disable -r site
   disable "site" configuration and reload nginx
-ngx-conf -f -r -x site1 site2
+ngx-conf -f remove -r site1 site2
   remove "site{1,2}" configurations without prompting and reload nginx
 
 Configuration Files
@@ -87,10 +94,10 @@ Aliases
 If you're interested in any sort of a2{dis,en}{conf,mod,site}, you can create
 some nice aliases. Examples:
 
-* a2ensite -- alias ngxensite='ngx-conf -e'
-* a2enconf -- alias ngxenconf='ngx-conf -e'
-* a2dissite -- alias ngxdissite='ngx-conf -d'
-* a2disconf -- alias ngxdisconf='ngx-conf -d'
+* a2ensite -- alias ngxensite='ngx-conf enable'
+* a2enconf -- alias ngxenconf='ngx-conf enable'
+* a2dissite -- alias ngxdissite='ngx-conf disable'
+* a2disconf -- alias ngxdisconf='ngx-conf disable'
 
 Bugs
 ----
