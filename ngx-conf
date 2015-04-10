@@ -80,6 +80,7 @@ def parse_arguments():
         parents=[general_parser]
     )
     subparsers = parser.add_subparsers(dest='action')
+    subparsers.required = True
     # Add actual commands
     parser_enable = subparsers.add_parser('enable',
         parents=[general_parser, conf_action_parser],
