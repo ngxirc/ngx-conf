@@ -63,7 +63,7 @@ following order; the next read file will always override the previous.
 
 1. /etc/nginx/ngx.cfg
 #. /etc/ngx.cfg
-#. ngx.cfg
+#. ~/.ngx.cfg
 
 A sample configuration file with all options set to default::
 

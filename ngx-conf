@@ -48,7 +48,7 @@ config_opts = ConfigParser.SafeConfigParser({
     'force': 'no'})
 config_opts.read('/etc/nginx/ngx.cfg')
 config_opts.read('/etc/ngx.cfg')
-config_opts.read('ngx.cfg')
+config_opts.read('~/.ngx.cfg')
 
 # Variable that we'll use a lot.
 sites_en = config_opts.get('DEFAULT', 'base_dir') + config_opts.get('DEFAULT', 'sites_en')
