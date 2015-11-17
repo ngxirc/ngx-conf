@@ -110,7 +110,7 @@ def main():
     elif args.action == 'list':
         list_configs()
     if hasattr(args, 'reload') and args.reload:
-        reload_nginx()
+        reload_nginx(args.verbose)
 
 
 def enable_configs(configs, verbose, force):
@@ -269,7 +269,7 @@ def get_configs():
     return {'conf_dis': cd, 'conf_en': ce, 'sites_en': se, 'sites_dis': sd, 'sites_avail': sa}
 
 
-def reload_nginx():
+def reload_nginx(verbose = False):
     '''Reload Nginx after configuration changes.'''
     child = subprocess.Popen(
         ['service', 'nginx', 'reload'],
